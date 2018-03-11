@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# only take one argument
+if [ "$#" -ne 1 ]; then
+   exit 1
+fi
+
+# check if it exists
+if [ ! -e $1 ]; then
+   exit 1
+fi
+
+
+FILE=$(realpath $1)
+PACKAGE_FILE=/var/cache/pacman/pkg/$(pacman -Fo $FILE --machinereadable | awk -F'\0' '{print $2 "-"  $3}')-$(uname -m).pkg.tar.xz
+
+if [ ! -e $PACKAGE_FILE ]; then
+   echo "File $FILE is not owned by any package"
+   exit 1
+fi
+
+tar -xf $PACKAGE_FILE -C /tmp/ ${FILE:1}
+
+FILE_ORIG=/tmp/${FILE:1}
+
+diff -u --color $FILE_ORIG $FILE
+
+rm $FILE_ORIG
