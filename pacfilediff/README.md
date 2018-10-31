@@ -1,7 +1,8 @@
 # Pacfilediff
 
-`pacfilediff` shows changes to packaged file.
+`pacfilediff` shows the differences of a file compared to the packaged one.
 
+# Example
 ```bash
 $ pacfilediff /etc/pulse/daemon.conf
 ```
