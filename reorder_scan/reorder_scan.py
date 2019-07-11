@@ -28,44 +28,48 @@ def main():
         action="store_true",
         help="Do not rename, just print what would have been done",
     )
-    parser.add_argument("back_begin", help="The file at which the backside scan starts")
-    parser.add_argument("files", nargs="*", help="Files to reorder")
+    parser.add_argument(
+        "-b",
+        "--back",
+        nargs="*",
+        help="The file at which the backside scan starts or all backside files",
+    )
+    parser.add_argument("-f", "--files", nargs="*", help="Files to reorder")
     args = parser.parse_args()
 
     # check files
-    files = args.files
-    for idx, fname in enumerate(files):
-        fname = str(pathlib.Path(fname).absolute())
-        files[idx] = fname
-        if not pathlib.os.path.exists(fname):
-            # string could be an expression, try to expand it
-            possible_files = glob.glob(fname)
-            if len(possible_files) > 0:
-                for f in possible_files:
-                    files.insert(idx, f)
-            else:
-                raise Exception(f"File {fname} does not exists")
+    front = args.files
+    check_files(front)
+    back = args.back
+    check_files(back)
 
-    # make sure the back side file is in the stack
-    back = os.path.abspath(args.back_begin)
-    if not back in files:
-        raise Exception("The backside files must be a member of the files argument")
+    overlap = len(set(front) - set(back))
+
+    if overlap == 0:
+        sort_func = mode_1list
+    elif overlap == 1:
+        sort_func = mode_2lists
+    else:
+        # TODO error message
+        raise Exception()
+
+    rename_list = sort_func(front, back)
 
     # sort files
-    if not len(files) == set(files):
+    if not len(front) == set(front):
         print("Duplicates found, removing")
-        files = set(files)
-    files = sorted(files)
+        front = set(front)
+    front = sorted(front)
 
     # rename
-    back_begin = files.index(back)
+    back_begin = front.index(back)
     rename_list = []
-    num_digits = math.log10(len(files))
-    front_list = files[:back_begin]
-    back_list = files[back_begin:]
+    num_digits = math.log10(len(front))
+    front_list = front[:back_begin]
+    back_list = front[back_begin:]
     back_list.reverse()
-    files = front_list + back_list
-    for idx, fname in enumerate(files):
+    front = front_list + back_list
+    for idx, fname in enumerate(front):
         file_type = fname.split(".")[-1]
         new_file = f"{args.output_prefix}{idx}.{file_type}"
         new_file = pathlib.Path(args.output_folder).joinpath(new_file).absolute()
@@ -75,6 +79,30 @@ def main():
         print(f"Renaming {old} to {new}")
         if not args.dry_run:
             os.rename(old, new)
+
+
+def mode_1list(front, back):
+    pass
+
+
+def mode_2lists(front, back):
+    pass
+
+
+def check_files(files):
+    if type(files) != list:
+        raise Exception()
+    for idx, fname in enumerate(files):
+        fname = str(pathlib.Path(fname).absolute())
+        front[idx] = fname
+        if not pathlib.os.path.exists(fname):
+            # string could be an expression, try to expand it
+            possible_files = glob.glob(fname)
+            if len(possible_files) > 0:
+                for f in possible_files:
+                    front.insert(idx, f)
+            else:
+                raise Exception(f"File {fname} does not exists")
 
 
 if __name__ == "__main__":
