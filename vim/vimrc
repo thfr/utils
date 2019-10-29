@@ -1,0 +1,258 @@
+"----- Vim-Plug ------
+" Download via
+" $ curl -fLo ~/.vim/autoload/plug.vim --create-dirs "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+" Specify a directory for plugins
+" - For Neovim: ~/.local/share/nvim/plugged
+" - Avoid using standard Vim directory names like 'plugin'
+call plug#begin('~/.vim/plugged')
+let mapleader=","
+
+
+" Utility functions for vim scripts
+Plug 'vim-scripts/L9'
+
+" Git wrapper, see https://github.com/tpope/vim-fugitive
+Plug 'tpope/vim-fugitive'
+
+" <Leader><Leader>f<letter> to move forward to a certain occurence of the
+" letter
+Plug 'easymotion/vim-easymotion'
+let g:EasyMotion_smartcase = 1
+
+" Linter
+Plug 'vim-syntastic/syntastic'
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0
+let g:syntastic_check_on_write = 1
+
+Plug 'terryma/vim-multiple-cursors'
+
+" Monokai inspired colorscheme
+Plug 'tomasr/molokai'
+
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+Plug 'mileszs/ack.vim'
+let g:ackprg='rg --vimgrep'
+
+" Better linux command interaction
+Plug 'tpope/vim-eunuch'
+
+" easy alignment commands
+Plug 'tsaleh/vim-align'
+
+" file explorer
+Plug 'scrooloose/nerdtree'
+map <F2> :NERDTreeToggle<CR>
+map <F7> :NERDTreeFind<CR>
+
+" Code overview
+Plug 'vim-scripts/Tagbar'
+noremap <F3> :TagbarToggle<CR>
+
+" ctrl-p ftw
+Plug 'vim-scripts/ctrlp.vim'
+nnoremap <C-x> :CtrlPBufTagAll<CR>
+nnoremap <C-y> :CtrlPBuffer<CR>
+
+" change surrounding parathesis or quotes or ...
+Plug 'vim-scripts/surround.vim'
+
+" Code completion
+let g:python_host_prog = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3'
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py  --all --ninja'}
+nnoremap gd :YcmCompleter GoTo<CR>
+nnoremap ü :YcmCompleter GetType<CR>
+let g:ycm_always_populate_location_list = 1
+
+" Latexsupport for vim
+Plug 'lervag/vimtex'
+
+"Syntax Highlighting for Fish Shell
+Plug 'aliva/vim-fish'
+
+" Plug 'OmniSharp/omnisharp-vim'
+Plug 'tpope/vim-dispatch'
+
+" Toggle Location and Quickfix list
+Plug 'Valloric/ListToggle'
+let g:lt_location_list_toggle_map = '<leader>Q'
+let g:lt_quickfix_list_toggle_map = '<leader>q'
+
+" exchange to words with the command cx
+Plug 'tommcdo/vim-exchange'
+
+" Completion for unicode and digraph chars
+" Plug 'unicode.vim'
+
+
+" ]x [x for html encoding / decoding
+Plug 'tpope/vim-unimpaired'
+
+" Obsession
+Plug 'tpope/vim-obsession'
+
+Plug 'Chiel92/vim-autoformat'
+noremap cf :Autoformat<CR>
+
+Plug 'MattesGroeger/vim-bookmarks'
+
+" Initialize plugin system
+call plug#end()
+
+
+" Plugin Settings:
+" vimtex:
+let g:tex_flavor = 'latex'
+let g:vimtex_view_method = 'zathura'
+
+" airline:
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts=1
+let g:airline_theme='minimalist'
+
+
+" Costum Settings:
+" Where swap files go
+set directory=~/.vim/swap
+
+set number
+set t_Co=256
+syntax on
+colorscheme molokai
+set wildmode=longest,list,full
+set wildmenu
+
+" Tab settings
+set tabstop=4
+set shiftwidth=4
+set expandtab
+"let ftplugin NOT override tabstop for python files
+let g:python_recommended_style=0
+
+" :SuperRetab 4 replaces all leftmost 4 whitespaces with one tab
+command! -nargs=1 -range SuperRetab <line1>,<line2>s/\v%(^ *)@<= {<args>}/\t/g
+set laststatus=2
+" Soft wrap
+set wrap linebreak nolist
+if &shell =~# 'fish$'
+   set shell=/bin/bash
+endif
+
+" c++ indentation options:
+"   N-s: no indent in namespace
+"   g0: do not indent public: private: protected
+set cino=t0N-sg0
+
+" ignore case in search until there is a upper letter
+set smartcase
+set ignorecase
+
+" find todos
+noremap <F5> :vimgrep /todo/j % <CR>
+
+" C/C++: switch between header and implementation
+noremap <F6> :e %:p:s,.hpp$,.X123X,:s,.cpp$,.hpp,:s,.X123X$,.cpp,<CR>
+
+" relative line numbers
+set rnu
+
+" Remove trailing spaces
+autocmd BufWritePre *.py :%s/\s\+$//e
+autocmd BufWritePre *.tex :%s/\s\+$//e
+autocmd BufWritePre *.cs :%s/\s\+$//e
+autocmd BufWritePre *.md :%s/\s\+$//e
+autocmd BufWritePre *.vimrc :%s/\s\+$//e
+autocmd BufWritePre *.c :%s/\s\+$//e
+autocmd BufWritePre *.h :%s/\s\+$//e
+autocmd BufWritePre *.cpp :%s/\s\+$//e
+autocmd BufWritePre *.hpp :%s/\s\+$//e
+autocmd BufWritePre *.h :%s/\s\+$//e
+autocmd BufWritePre *.rs :%s/\s\+$//e
+noremap <F4> :%s/\s\+$//e <CR>
+
+" allow doxygen comments
+autocmd Filetype c,cpp set comments^=:///
+
+" Move through wrapped lines
+" map j gj
+" map k gk
+
+" provide hjkl movements in Insert mode via the <Alt> modifier key
+inoremap <A-h> <C-o>h
+inoremap <A-j> <C-o>j
+inoremap <A-k> <C-o>k
+inoremap <A-l> <C-o>l
+
+""" Gui Options
+" no menu or Toolbar in qvim oder gvim
+set guioptions-=m
+set guioptions-=T
+set guioptions-=L
+set guioptions-=l
+set guioptions-=r
+set guioptions-=R
+
+" big window
+if has("gui_running")
+   set lines=63 columns=200
+endif
+
+" disable blinking cursor
+set guicursor+=a:blinkon0
+
+" press - instead of <S-.> to reach the command line
+nnoremap Ö :
+vnoremap Ö :
+
+nnoremap n nzz
+vnoremap n nzz
+nnoremap N Nzz
+vnoremap N Nzz
+
+" gradle syntax highlighting
+au BufNewFile,BufRead *.gradle set filetype=groovy
+
+" MSIL syntax highlighting
+au BufNewFile,BufRead *.il set filetype=ilasm
+
+" rubics arch pseudo syntax highlighting
+au BufNewFile,BufRead *.arch set filetype=c
+au BufNewFile,BufRead *.inc set filetype=c
+
+au BufNewFile,BufRead *.tex set filetype=tex
+
+
+" Not sure why backspace does not work, so better save than sorry
+set backspace=indent,eol,start
+
+" Quickfix window as big as content
+" http://vim.wikia.com/wiki/Automatically_fitting_a_quickfix_window_height
+au FileType qf call AdjustWindowHeight(1, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+   let l = 1
+   let n_lines = 0
+   let w_width = winwidth(0)
+   while l <= line('$')
+      " number to float for division
+      let l_len = strlen(getline(l)) + 0.0
+      let line_width = l_len/w_width
+      let n_lines += float2nr(ceil(line_width))
+      let l += 1
+   endw
+   exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
+endfunction
+
+" Spellsuggest not too long
+set spellsuggest=best,25
+autocmd FileType gitcommit setlocal spell
+
+" set foldmethod=syntax
+
+" Extra settings, probably device specific
+" silent! so ~/.vimrc_extra
+
+" Project specific settings
+" silent! so .vimlocal
