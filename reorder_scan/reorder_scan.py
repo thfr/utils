@@ -44,7 +44,9 @@ def main():
 
     if len(back) == 0:
         if len(front) % 2 == 1:
-            raise Exception("Something is wrong with the scan, the number of pages should be even")
+            raise Exception(
+                "Something is wrong with the scan, the number of pages should be even"
+            )
         back = front[len(front) / 2 :]
 
     has_duplicates = lambda x: len(x) != len(set(x))
@@ -52,7 +54,9 @@ def main():
     if has_duplicates(front) or has_duplicates(back):
         raise Exception("Duplicates found")
 
-    new_files = reorder(front, back, os.path.join(args.output_folder, args.output_prefix))
+    new_files = reorder(
+        front, back, os.path.join(args.output_folder, args.output_prefix)
+    )
 
     if args.dry_run:
         pprint.pprint(new_files)
@@ -67,8 +71,8 @@ def reorder(front, back, out_prefix=""):
     num_digits = math.ceil(math.log10(len(front) + len(back)))
     file_counter = 0
     format_string = out_prefix + "_{cnt:0" + str(num_digits) + "}{ext}"
-    get_file_type = lambda x: x[x.rfind("."):]
-    for f,b in zip(front,back):
+    get_file_type = lambda x: x[x.rfind(".") :]
+    for f, b in zip(front, back):
         new_order[f] = format_string.format(cnt=file_counter, ext=get_file_type(f))
         file_counter += 1
         new_order[b] = format_string.format(cnt=file_counter, ext=get_file_type(b))
@@ -91,8 +95,8 @@ def normalize_files(files):
             if len(possible_files) > 0:
                 for fname_from_glob in possible_files:
                     fname_from_glob = str(pathlib.Path(fname).absolute())
-                if pathlib.os.path.exists(fname_from_glob):
-                    normalized_files.append(fname_from_glob)
+                    if pathlib.os.path.exists(fname_from_glob):
+                        normalized_files.append(fname_from_glob)
             else:
                 raise Exception(f"File {fname} does not exists")
 
