@@ -3,11 +3,20 @@
 
 import subprocess
 import datetime
+import argparse
 
 
 def main():
+   parser = argparse.ArgumentParser(
+       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+   parser.add_argument("--since",
+                       default="today",
+                       help="Journalctl --since=<arg>")
+   args = parser.parse_args()
+
    logind_log = subprocess.check_output(
-       "journalctl --since=today _PID=1".split(), universal_newlines=True)
+       f"journalctl --since={args.since} _PID=1".split(),
+       universal_newlines=True)
    logind_log = logind_log.splitlines()[1:]
 
    parsed_log = parse_log(logind_log)
@@ -22,7 +31,10 @@ def parse_log(log):
    parsed_log = []
    for line in log:
       line_splitted = line.split()
-      date = parse_systemd_date(str.join(' ', line_splitted[0:3]))
+      try:
+         date = parse_systemd_date(str.join(' ', line_splitted[0:3]))
+      except:
+         continue
       message = str.join(' ', line_splitted[5:])
       parsed_log.append((date, message))
 
@@ -39,22 +51,34 @@ def get_uptime(uptime_output):
    sleep_ongoing = False
    sleep_time = datetime.timedelta()
    sleep_start = start_time
+
+   poweroff_marker = "Shutting down."
+   poweroff_ongoing = False
+   poweroff_time = datetime.timedelta()
+   poweroff_start = start_time
    for date, message in uptime_output:
-      if not (marker_sleep_starts in message or marker_sleep_stops in message):
+      if poweroff_ongoing:
+         poweroff_ongoing = False
+         poweroff_time += date - poweroff_start
+      elif not (marker_sleep_starts in message or marker_sleep_stops in message
+                or poweroff_marker in message):
          continue
-      if marker_sleep_stops in message:
+      elif marker_sleep_stops in message:
          if not sleep_ongoing:
             # log started with device waking up from sleep
             continue
          sleep_time += date - sleep_start
          sleep_ongoing = False
-      if marker_sleep_starts in message:
+      elif marker_sleep_starts in message:
          if sleep_ongoing:
             raise Exception()
          sleep_ongoing = True
          sleep_start = date
+      elif poweroff_marker in message:
+         poweroff_start = date
+         poweroff_ongoing = True
 
-   return current_runtime - sleep_time
+   return current_runtime - sleep_time - poweroff_time
 
 
 def parse_systemd_date(date):
