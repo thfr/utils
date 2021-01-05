@@ -13,6 +13,7 @@ Plug 'vim-scripts/L9'
 
 " Git wrapper, see https://github.com/tpope/vim-fugitive
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-scriptease'
 
 " <Leader><Leader>f<letter> to move forward to a certain occurence of the
 " letter
@@ -34,7 +35,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 Plug 'mileszs/ack.vim'
-let g:ackprg='rg --vimgrep'
+" let g:ackprg='rg --vimgrep'
+let g:ackprg='rg --smart-case --no-heading -n'
 
 " Better linux command interaction
 Plug 'tpope/vim-eunuch'
@@ -47,9 +49,25 @@ Plug 'scrooloose/nerdtree'
 map <F2> :NERDTreeToggle<CR>
 map <F7> :NERDTreeFind<CR>
 
+Plug 'jszakmeister/markdown2ctags'
+
 " Code overview
 Plug 'vim-scripts/Tagbar'
 noremap <F3> :TagbarToggle<CR>
+let g:tagbar_type_markdown = {
+    \ 'ctagstype': 'markdown',
+    \ 'ctagsbin' : '~/.vim/plugged/markdown2ctags/markdown2ctags.py',
+    \ 'ctagsargs' : '-f - --sort=yes --sro=»',
+    \ 'kinds' : [
+        \ 's:sections',
+        \ 'i:images'
+    \ ],
+    \ 'sro' : '»',
+    \ 'kind2scope' : {
+        \ 's' : 'section',
+    \ },
+    \ 'sort': 0
+\ }
 
 " ctrl-p ftw
 Plug 'vim-scripts/ctrlp.vim'
@@ -62,7 +80,7 @@ Plug 'vim-scripts/surround.vim'
 " Code completion
 let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py  --all --ninja'}
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py  --clang-completer --rust-completer --go-completer --ts-completer --cs-completer --ninja'}
 nnoremap gd :YcmCompleter GoTo<CR>
 nnoremap ü :YcmCompleter GetType<CR>
 let g:ycm_always_populate_location_list = 1
@@ -75,6 +93,7 @@ Plug 'aliva/vim-fish'
 
 " Plug 'OmniSharp/omnisharp-vim'
 Plug 'tpope/vim-dispatch'
+"let g:dispatch_no_tmux_make = 1
 
 " Toggle Location and Quickfix list
 Plug 'Valloric/ListToggle'
@@ -98,6 +117,8 @@ Plug 'Chiel92/vim-autoformat'
 noremap cf :Autoformat<CR>
 
 Plug 'MattesGroeger/vim-bookmarks'
+
+Plug 'rust-lang/rust.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -140,6 +161,8 @@ set wrap linebreak nolist
 if &shell =~# 'fish$'
    set shell=/bin/bash
 endif
+
+set grepprg=rg\ --smart-case\ --no-heading\ -n\ $*
 
 " c++ indentation options:
 "   N-s: no indent in namespace
@@ -249,10 +272,15 @@ endfunction
 set spellsuggest=best,25
 autocmd FileType gitcommit setlocal spell
 
+" Add { and } as word separators
+set iskeyword-={
+set iskeyword-=}
+
 " set foldmethod=syntax
 
 " Extra settings, probably device specific
-" silent! so ~/.vimrc_extra
+silent! so ~/.vimrc_extra
+
 
 " Project specific settings
 " silent! so .vimlocal
