@@ -56,8 +56,8 @@ map <F7> :NERDTreeFind<CR>
 Plug 'jszakmeister/markdown2ctags'
 
 " Code overview
-Plug 'vim-scripts/Tagbar'
-noremap <F3> :TagbarToggle<CR>
+Plug 'preservim/tagbar'
+noremap <F3> :TagbarOpenAutoClose<CR>
 let g:tagbar_type_markdown = {
             \ 'ctagstype': 'markdown',
             \ 'ctagsbin' : '~/.vim/plugged/markdown2ctags/markdown2ctags.py',
@@ -91,7 +91,7 @@ Plug 'vim-scripts/surround.vim'
 
 " Conquer of Completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ['coc-clangd', 'coc-pyright', 'coc-rust-analyzer', 'coc-texlab', 'coc-yaml', 'coc-markdownlint', 'coc-json']
+let g:coc_global_extensions = ['coc-clangd', 'coc-pyright', 'coc-rust-analyzer', 'coc-texlab', 'coc-yaml', 'coc-markdownlint', 'coc-json', 'coc-sh']
 
 " Latexsupport for vim
 " Plug 'lervag/vimtex'
@@ -128,6 +128,10 @@ Plug 'MattesGroeger/vim-bookmarks'
 
 Plug 'rust-lang/rust.vim'
 
+Plug 'junegunn/fzf.vim'
+" FZF Plugin
+noremap <C-k> :FZF<CR>
+
 " Initialize plugin system
 call plug#end()
 
@@ -146,6 +150,9 @@ let g:airline_theme='minimalist'
 " Costum Settings:
 " Where swap files go
 set directory=~/.vim/swap
+
+" Clear search with /
+noremap / :let @/=""<CR>/
 
 set number
 if has('nvim')
@@ -236,6 +243,10 @@ endif
 
 " disable blinking cursor
 set guicursor+=a:blinkon0
+
+" highlight cursor line number
+set cursorline
+set cursorlineopt=number
 
 " press - instead of <S-.> to reach the command line
 nnoremap Ö :
